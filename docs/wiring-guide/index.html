@@ -5,111 +5,139 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CyberShot Cam 配線・はんだガイド</title>
 <style>
+/* Monochrome drawing sheet: white line work on black, a faint grid, one accent (solder only). */
 :root{
-  --bg:#111315; --bg2:#171a1d; --line:#2b3035; --line2:#3a4046;
-  --ink:#e8e4dc; --muted:#9a958b; --faint:#6c6861;
-  --amber:#f0a640; --cyan:#7fd4ec; --red:#ef6a6a; --green:#8fcf9a;
+  --bg:#0a0a0a; --ink:#ececec; --muted:#8c8c8c; --faint:#5c5c5c;
+  --line:#2c2c2c; --line2:#454545; --accent:#ff5a2a;
   --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
-a{color:var(--cyan)}
-.wrap{max-width:1120px;margin:0 auto;padding:48px 20px 96px}
-code,.mono{font-family:var(--mono);font-size:.92em}
-code{color:var(--cyan)}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:
+    linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px),
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:-1px -1px}
+a{color:var(--ink)}
+.sheet{max-width:1160px;margin:32px auto 80px;border:1px solid var(--line2);background:rgba(10,10,10,.82);position:relative}
+.sheet::before,.sheet::after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--ink)}
+.sheet::before{left:-8px;top:-8px;border-right:none;border-bottom:none}
+.sheet::after{right:-8px;bottom:-8px;border-left:none;border-top:none}
+.inner{padding:36px 36px 48px}
+@media (max-width:700px){.sheet{margin:0;border-left:none;border-right:none}.inner{padding:24px 16px 40px}}
+code,.mono{font-family:var(--mono);font-size:.9em}
+code{color:var(--ink);border-bottom:1px dotted var(--faint)}
+.cap{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 
-header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
-header .kicker{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em;margin:0}
-header h1{font-size:28px;font-weight:600;letter-spacing:.02em;line-height:1.35;margin:6px 0 10px}
-header p{margin:0;max-width:68ch;color:var(--muted)}
-.facts{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px;font-family:var(--mono);font-size:13px;color:var(--muted)}
-.facts b{color:var(--ink);font-weight:500}
-.facts b.amber{color:var(--amber)}
+header{display:grid;grid-template-columns:1fr 330px;gap:28px;align-items:end;padding-bottom:24px;border-bottom:1px solid var(--line2)}
+@media (max-width:860px){header{grid-template-columns:1fr}}
+header h1{font-size:30px;font-weight:600;letter-spacing:.01em;line-height:1.3;margin:8px 0 12px}
+header p{margin:0;max-width:62ch;color:var(--muted);font-size:14px}
+.titleblock{border:1px solid var(--line2);display:grid;grid-template-columns:1fr 1fr;font-family:var(--mono);font-size:12px}
+.titleblock div{padding:6px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.titleblock div:nth-child(2n){border-right:none}
+.titleblock div:nth-last-child(-n+2){border-bottom:none}
+.titleblock span{display:block;font-size:10px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.titleblock b{font-weight:500;color:var(--ink)}
+.titleblock b.accent{color:var(--accent)}
 
-.bench{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
-@media (max-width:860px){.bench{grid-template-columns:1fr;gap:16px}}
-.steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-@media (max-width:860px){.steps{display:flex;overflow-x:auto;border-top:none;gap:6px;padding-bottom:4px}}
-.steps li{border-bottom:1px solid var(--line)}
-@media (max-width:860px){.steps li{border:1px solid var(--line);flex:0 0 auto}}
-.steps button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:baseline;width:100%;padding:9px 8px 9px 4px;color:var(--muted)}
-@media (max-width:860px){.steps button{grid-template-columns:auto auto;padding:6px 10px}.steps .kind{display:none}}
+.bench{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;margin-top:28px}
+@media (max-width:860px){.bench{grid-template-columns:1fr;gap:14px}}
+.steps{list-style:none;margin:0;padding:0;border:1px solid var(--line2)}
+@media (max-width:860px){.steps{display:flex;overflow-x:auto}}
+.steps li+li{border-top:1px solid var(--line)}
+@media (max-width:860px){.steps li+li{border-top:none;border-left:1px solid var(--line)}}
+.steps button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;width:100%;padding:8px 10px;color:var(--muted)}
+@media (max-width:860px){.steps button{grid-template-columns:auto auto;white-space:nowrap}.steps .kind{display:none}}
 .steps button:hover{color:var(--ink)}
-.steps button:focus-visible{outline:1px solid var(--cyan);outline-offset:-1px}
-.steps button[aria-current="step"]{color:var(--ink);background:var(--bg2);box-shadow:inset 2px 0 0 var(--amber)}
-.steps .n{font-family:var(--mono);font-size:13px;color:var(--faint)}
-.steps [aria-current="step"] .n{color:var(--amber)}
+.steps button:focus-visible{outline:1px solid var(--ink);outline-offset:-3px}
+.steps button[aria-current="step"]{background:var(--ink);color:var(--bg)}
+.steps .n{font-family:var(--mono);font-size:12px;width:22px;height:22px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%}
 .steps .t{font-size:14px}
-.steps .kind{font-size:11px;color:var(--faint)}
-.steps .kind.solder{color:var(--amber);opacity:.85}
+.steps .kind{font-family:var(--mono);font-size:10px;letter-spacing:.1em}
+.steps .kind.solder::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:1px}
 
 figure{margin:0}
-.frame{position:relative;border:1px solid var(--line);background:#02070c;aspect-ratio:14/9}
+.frame{position:relative;border:1px solid var(--line2);background:#000;aspect-ratio:14/9;padding:0}
 .frame img,.frame canvas{display:block;width:100%;height:100%;object-fit:cover}
 .frame [hidden]{display:none}
-.switch{position:absolute;right:10px;top:10px;display:flex;font-size:12px;border:1px solid var(--line2);background:rgba(10,12,14,.75)}
+.ruler{position:absolute;pointer-events:none;opacity:.55}
+.ruler.top{left:0;right:0;top:0;height:8px;background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 20px)}
+.ruler.left{top:0;bottom:0;left:0;width:8px;background:repeating-linear-gradient(180deg,var(--ink) 0 1px,transparent 1px 20px)}
+.switch{position:absolute;right:12px;top:14px;display:flex;font-family:var(--mono);font-size:11px;letter-spacing:.1em;border:1px solid var(--line2);background:rgba(0,0,0,.7)}
 .switch button{all:unset;cursor:pointer;padding:3px 10px;color:var(--muted)}
 .switch button[aria-pressed="true"]{color:var(--bg);background:var(--ink)}
-.switch button:focus-visible{outline:1px solid var(--cyan)}
-.hint{position:absolute;left:10px;bottom:8px;font-size:12px;color:var(--muted);background:rgba(10,12,14,.6);padding:0 6px}
-figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding:8px 0 0;font-size:13px;color:var(--muted)}
+.switch button:focus-visible{outline:1px solid var(--ink)}
+.hint{position:absolute;left:14px;bottom:10px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding:10px 0 0;font-size:13px;color:var(--muted);border-top:none}
 figcaption b{color:var(--ink);font-weight:500}
-.legend{display:flex;flex-wrap:wrap;gap:4px 14px}
-.sw{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:4px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px}
+.sw{display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:4px}
 .sw.dot{width:8px;height:8px;border-radius:50%;vertical-align:1px}
 
-.detail{margin-top:22px}
-.detail h2{font-size:19px;font-weight:600;margin:0 0 6px}
-.detail ol{margin:0;padding-left:1.4em}
+.detail{margin-top:24px;border-top:1px solid var(--line);padding-top:18px}
+.detail h2{font-size:19px;font-weight:600;margin:0 0 8px}
+.detail ol{margin:0;padding-left:1.5em}
 .detail li{margin:4px 0}
-.detail li::marker{color:var(--faint);font-family:var(--mono);font-size:13px}
+.detail li::marker{color:var(--faint);font-family:var(--mono);font-size:12px}
 .detail b{color:#fff;font-weight:600}
-.joints{margin:12px 0 0;padding:8px 12px;border-left:2px solid var(--amber);background:rgba(240,166,64,.06);font-size:14px}
-.joints::before{content:"はんだ付け　";color:var(--amber)}
+.joints{margin:14px 0 0;padding:8px 12px;border:1px solid var(--line2);font-size:14px}
+.joints::before{content:"はんだ付け";font-family:var(--mono);font-size:11px;color:var(--accent);margin-right:12px;letter-spacing:.06em}
 .note{font-size:13px;color:var(--muted)}
-.warn{margin:12px 0 0;padding:8px 12px;border-left:2px solid var(--red);background:rgba(239,106,106,.07);font-size:14px}
+.warn{margin:14px 0 0;padding:8px 12px;border:1px solid var(--ink);font-size:14px}
+.warn::before{content:"注意";font-family:var(--mono);font-size:11px;margin-right:12px;padding:0 5px;background:var(--ink);color:var(--bg)}
 
-section{margin-top:64px}
-section > h2{display:flex;gap:12px;align-items:baseline;font-size:20px;font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-section > h2 .n{font-family:var(--mono);font-size:13px;color:var(--faint);font-weight:400}
+section{margin-top:60px}
+section > h2{display:flex;gap:14px;align-items:baseline;font-size:19px;font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line2)}
+section > h2 .n{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400;letter-spacing:.1em}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;font-weight:500;color:var(--muted)}
+th,td{text-align:left;padding:8px 14px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:var(--faint)}
 td.pin{font-family:var(--mono);font-size:13px;white-space:nowrap}
 td .sw{vertical-align:3px}
 .how{font-size:12px;white-space:nowrap;color:var(--muted)}
-.how.solder{color:var(--amber)}
-.ok{color:var(--green);white-space:nowrap}
-.chk{color:var(--amber);white-space:nowrap}
+.how.solder::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.how.solder{color:var(--ink)}
+.ok,.chk{font-family:var(--mono);font-size:12px;white-space:nowrap}
+.ok{color:var(--ink)}
+.ok::before{content:"● "}
+.chk{color:var(--muted)}
+.chk::before{content:"△ "}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px}
 @media (max-width:760px){.cols{grid-template-columns:1fr}}
 .cols h3{font-size:15px;font-weight:600;margin:0 0 6px}
-.cols ul,.plain{margin:0;padding-left:1.2em}
-.cols li,.plain li{margin:3px 0}
-.parts{columns:2;column-gap:40px;margin:0;padding-left:1.2em}
+.cols ul{margin:0;padding-left:1.2em}
+.cols li{margin:3px 0}
+.parts{list-style:none;margin:0;padding:0;columns:2;column-gap:40px;counter-reset:p}
 @media (max-width:760px){.parts{columns:1}}
-.parts li{margin:3px 0;break-inside:avoid}
-.parts span{color:var(--muted);font-size:13px}
-footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--faint)}
+.parts li{break-inside:avoid;display:flex;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);counter-increment:p}
+.parts li::before{content:counter(p,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--faint);padding-top:2px}
+.parts span{color:var(--muted);font-size:13px;margin-left:auto;padding-left:8px}
+footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-size:12px;color:var(--faint);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="sheet"><div class="inner">
 
 <header>
-  <p class="kicker">ESP32-S3 WROOM CAM / ST7735 1.8" / KY-023 / 18650</p>
-  <h1>CyberShot Cam 配線・はんだガイド</h1>
-  <p>Freenove ESP32-S3 WROOM CAM（N16R8）で CyberShot Cam を組み立て、電池で動かすまでの手順です。手順を選ぶと、その手順で使う線と、はんだ付けする場所（オレンジの点）が図に出ます。「3D」に切り替えると、ドラッグで回して見られます。</p>
-  <div class="facts">
-    <span>はんだ付け <b class="amber" id="jointCount">–</b> か所</span>
-    <span>差すだけの線 <b id="jumpCount">–</b> 本</span>
-    <span>手順 <b>0〜8</b></span>
-    <span>電源 <b>18650 → 5.0V</b></span>
+  <div>
+    <p class="cap">ESP32-S3 WROOM CAM / ST7735 1.8" / KY-023 / 18650</p>
+    <h1>CyberShot Cam 配線・はんだガイド</h1>
+    <p>Freenove ESP32-S3 WROOM CAM（N16R8）で CyberShot Cam を組み立て、電池で動かすまでの手順です。手順を選ぶと、その手順で使う線と、はんだ付けする場所（赤い点）が図に出ます。「3D」に切り替えると、ドラッグで回して見られます。</p>
+  </div>
+  <div class="titleblock">
+    <div><span>Solder joints</span><b class="accent" id="jointCount">–</b></div>
+    <div><span>Jumper wires</span><b id="jumpCount">–</b></div>
+    <div><span>Steps</span><b>0 – 8</b></div>
+    <div><span>Supply</span><b>18650 → 5.0 V</b></div>
+    <div><span>Board</span><b>ESP32-S3 N16R8</b></div>
+    <div><span>Sheet</span><b>1 / 1</b></div>
   </div>
 </header>
 
@@ -119,6 +147,7 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
     <figure>
       <div class="frame">
         <img id="renderImg" alt="">
+        <i class="ruler top"></i><i class="ruler left"></i>
         <canvas id="gl" hidden aria-label="部品と配線の3D図。ドラッグで回転できる"></canvas>
         <div class="switch" role="group" aria-label="表示の切り替え">
           <button id="tabRender" type="button" aria-pressed="true">画像</button>
@@ -129,11 +158,10 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
       <figcaption>
         <span id="caption">–</span>
         <span class="legend">
-          <span><i class="sw" style="background:#ff5a62"></i>電源 +</span>
-          <span><i class="sw" style="background:#cfe0ea"></i>GND</span>
-          <span><i class="sw" style="background:#4fd8ff"></i>信号</span>
-          <span><i class="sw" style="background:#ffd24a"></i>抵抗→LED</span>
-          <span><i class="sw dot" style="background:#ffae42"></i>はんだ</span>
+          <span><i class="sw" style="background:#ffffff"></i>電源 +</span>
+          <span><i class="sw" style="background:#9a9a9a"></i>信号</span>
+          <span><i class="sw" style="background:#3a3a3a;outline:1px solid #555"></i>GND</span>
+          <span><i class="sw dot" style="background:#ff5a2a"></i>はんだ</span>
         </span>
       </figcaption>
     </figure>
@@ -142,7 +170,7 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
 </div>
 
 <section>
-  <h2><span class="n">1</span>配線表</h2>
+  <h2><span class="n">01</span>配線表</h2>
   <div class="tablewrap">
   <table>
     <thead><tr><th>部品</th><th>部品側の端子</th><th>つなぐ先</th><th>つなぎ方</th><th>手順</th></tr></thead>
@@ -153,7 +181,7 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
 </section>
 
 <section>
-  <h2><span class="n">2</span>部品</h2>
+  <h2><span class="n">02</span>部品</h2>
   <ul class="parts">
     <li>Freenove ESP32-S3 WROOM CAM（N16R8、OV2640 付き）</li>
     <li>1.8インチ SPI 液晶 ST7735（128×160）</li>
@@ -172,7 +200,7 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
 </section>
 
 <section>
-  <h2><span class="n">3</span>はんだ付けが初めての人へ</h2>
+  <h2><span class="n">03</span>はんだ付けが初めての人へ</h2>
   <div class="cols">
     <div>
       <h3>1か所の流れ</h3>
@@ -198,7 +226,7 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
 </section>
 
 <section>
-  <h2><span class="n">4</span>プログラムとの照合</h2>
+  <h2><span class="n">04</span>プログラムとの照合</h2>
   <p class="note">ピン番号は <code>src/main.cpp</code> と Freenove 公式のピン配置図で照らし合わせています。</p>
   <div class="tablewrap">
   <table>
@@ -223,15 +251,16 @@ footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-si
 </section>
 
 <footer>
-  CyberShot Cam のファームウェアは cebola4444 によるもの。このガイドの図は <code>docs/wiring-guide/render_steps.py</code>（Blender）で作っています。
+  <span>ファームウェア：cebola4444 / CyberShot Cam</span>
+  <span>図：<code>docs/wiring-guide/render_steps.py</code>（Blender）</span>
 </footer>
-</div>
+</div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 (function(){
-const RED=0xff5a62, GND=0xcfe0ea, SIG=0x4fd8ff, YEL=0xffd24a;
+const RED=0xffffff, GND=0x3a3a3a, SIG=0x9a9a9a, YEL=0x9a9a9a; // power, ground, signal, resistor-to-LED
 
 const comps = {
   board:{name:"ESP32-S3 BOARD", pos:[0,0,0], size:[6.4,0.25,2.8]},
@@ -360,7 +389,7 @@ const STEPS = [
    <p class="joints">VOUT+ と VOUT- の 2か所</p>`},
   {n:9, t:"全体", kind:"all", all:true, focus:[], body:`
    <h2>全体図</h2>
-   <p>オレンジの点がはんだ付けする場所です。ボードのピンは Freenove 公式のピン配置図の並び（右がアンテナ側、左が USB 側）です。実物でも、ボードの印字を見ながらつないでください。</p>`},
+   <p>赤い点がはんだ付けする場所です。ボードのピンは Freenove 公式のピン配置図の並び（右がアンテナ側、左が USB 側）です。実物でも、ボードの印字を見ながらつないでください。</p>`},
 ];
 const kindLabel={solder:"はんだ",plug:"差す",prep:"準備",all:""};
 
@@ -400,9 +429,9 @@ function label(text,size,color){
   const c=document.createElement("canvas"), g=c.getContext("2d"); const fs=46;
   const font=`500 ${fs}px ui-monospace,Menlo,"Hiragino Sans",monospace`;
   g.font=font; const w=Math.ceil(g.measureText(text).width)+30; c.width=w; c.height=fs+22; g.font=font;
-  g.fillStyle="rgba(2,12,20,0.82)"; g.fillRect(0,0,w,c.height);
-  g.strokeStyle=color||"#4fd8ff"; g.lineWidth=3; g.strokeRect(1.5,1.5,w-3,c.height-3);
-  g.fillStyle=color||"#bff0ff"; g.textBaseline="middle"; g.fillText(text,15,c.height/2+2);
+  g.fillStyle="rgba(0,0,0,0.85)"; g.fillRect(0,0,w,c.height);
+  g.strokeStyle=color||"#d0d0d0"; g.lineWidth=3; g.strokeRect(1.5,1.5,w-3,c.height-3);
+  g.fillStyle=color||"#f0f0f0"; g.textBaseline="middle"; g.fillText(text,15,c.height/2+2);
   const t=new THREE.CanvasTexture(c); t.minFilter=THREE.LinearFilter;
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));
   sp.scale.set(size*w/c.height,size,1); sp.renderOrder=10; return sp;
@@ -410,17 +439,17 @@ function label(text,size,color){
 if(has3D){
   renderer=new THREE.WebGLRenderer({canvas,antialias:true});
   renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
-  scene=new THREE.Scene(); scene.background=new THREE.Color(0x01060b); scene.fog=new THREE.Fog(0x01060b,28,60);
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x000000); scene.fog=new THREE.Fog(0x000000,28,60);
   camera=new THREE.PerspectiveCamera(40,14/9,0.1,200); camera.position.set(-2,17,19);
   controls=new THREE.OrbitControls(camera,canvas); controls.target.set(-1.5,0,2); controls.enableDamping=true; controls.maxPolarAngle=Math.PI*0.48;
-  scene.add(new THREE.AmbientLight(0x88ccff,0.5));
-  const dl=new THREE.DirectionalLight(0xbfe9ff,0.6); dl.position.set(5,12,6); scene.add(dl);
-  const grid=new THREE.GridHelper(60,60,0x1d6f8c,0x0c3346); grid.position.set(-1.5,0,2); scene.add(grid);
+  scene.add(new THREE.AmbientLight(0xffffff,0.5));
+  const dl=new THREE.DirectionalLight(0xffffff,0.6); dl.position.set(5,12,6); scene.add(dl);
+  const grid=new THREE.GridHelper(60,60,0x3a3a3a,0x1c1c1c); grid.position.set(-1.5,0,2); scene.add(grid);
 
   function holo(geom, y){
     const g=new THREE.Group();
-    const fill=new THREE.Mesh(geom,new THREE.MeshPhongMaterial({color:0x0b3550,transparent:true,opacity:0.35,emissive:0x06283a,shininess:80,depthWrite:false}));
-    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geom),new THREE.LineBasicMaterial({color:0x4fd8ff,transparent:true,opacity:0.95}));
+    const fill=new THREE.Mesh(geom,new THREE.MeshPhongMaterial({color:0x2a2a2a,transparent:true,opacity:0.35,emissive:0x111111,shininess:80,depthWrite:false}));
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geom),new THREE.LineBasicMaterial({color:0xf0f0f0,transparent:true,opacity:0.95}));
     g.add(fill); g.add(edges); g.position.y=y||0; g.userData.edge=edges; g.userData.fill=fill; return g;
   }
   Object.entries(comps).forEach(([id,c])=>{
@@ -441,7 +470,7 @@ if(has3D){
     compObjs[id]={parts,label:lb};
   });
   Object.entries(P).forEach(([id,p])=>{ if(p.comp==="bus") return;
-    const m=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.06,12),new THREE.MeshBasicMaterial({color:0xffcf8a,transparent:true}));
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.06,12),new THREE.MeshBasicMaterial({color:0xbdbdbd,transparent:true}));
     m.position.set(p.x,p.y-0.02,p.z); scene.add(m); });
   function wirePath(a,b){
     const pa=new THREE.Vector3(a.x,a.y,a.z), pb=new THREE.Vector3(b.x,b.y,b.z);
@@ -454,8 +483,8 @@ if(has3D){
     const glow=new THREE.Mesh(new THREE.TubeGeometry(path,48,0.16,8,false),new THREE.MeshBasicMaterial({color:w[2],transparent:true,opacity:0.18,blending:THREE.AdditiveBlending,depthWrite:false}));
     scene.add(core); scene.add(glow); return {w,core,glow}; });
   jointObjs=[...jointSet].map(id=>{ const p=P[id];
-    const m=new THREE.Mesh(new THREE.SphereGeometry(0.18,16,12),new THREE.MeshBasicMaterial({color:0xffae42,transparent:true}));
-    const halo=new THREE.Mesh(new THREE.SphereGeometry(0.42,16,12),new THREE.MeshBasicMaterial({color:0xff8a1a,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending,depthWrite:false}));
+    const m=new THREE.Mesh(new THREE.SphereGeometry(0.18,16,12),new THREE.MeshBasicMaterial({color:0xff5a2a,transparent:true}));
+    const halo=new THREE.Mesh(new THREE.SphereGeometry(0.42,16,12),new THREE.MeshBasicMaterial({color:0xff3d10,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending,depthWrite:false}));
     m.position.set(p.x,p.y+0.08,p.z); halo.position.copy(m.position); scene.add(m); scene.add(halo); return {id,m,halo}; });
 } else {
   tabL.disabled=true; tabL.title="3D 表示を読み込めませんでした";
@@ -487,7 +516,7 @@ function select(i){
     pinLabels.forEach(l=>scene.remove(l)); pinLabels=[];
     if(!s.all){ const ids=new Set(); actWires.forEach(w=>{ids.add(w[0]); ids.add(w[1]);});
       ids.forEach(id=>{ const p=P[id]; if(!p) return; const isB=p.comp==="board";
-        const l=label(isB?(/^\d+$/.test(p.label)?"GPIO "+p.label:p.label):p.label,0.36,isB?"#ffcf8a":"#bff0ff");
+        const l=label(isB?(/^\d+$/.test(p.label)?"GPIO "+p.label:p.label):p.label,0.36,isB?"#ffffff":"#bdbdbd");
         l.position.set(p.x,p.y+0.75,p.z+(isB?(p.z<0?-0.55:0.55):-0.5)); scene.add(l); pinLabels.push(l); }); }
   }
   try{ localStorage.setItem("cybershot-step",String(i)); }catch(e){}

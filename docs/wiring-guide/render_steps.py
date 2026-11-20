@@ -14,7 +14,9 @@ os.makedirs(OUT, exist_ok=True)
 def V(x, y, z):  # page coords -> blender
     return Vector((x, -z, y))
 
-RED, BLK, SIG, YEL = (1.0, 0.18, 0.22), (0.80, 0.86, 0.92), (0.15, 0.80, 1.0), (1.0, 0.80, 0.20)
+# monochrome blueprint palette: power = white, signal = light grey, GND = dark grey; only solder joints carry colour
+RED, BLK, SIG, YEL = (1.0, 1.0, 1.0), (0.07, 0.07, 0.07), (0.38, 0.38, 0.38), (0.38, 0.38, 0.38)
+ACCENT = (1.0, 0.32, 0.12)
 
 comps = {
     "board": ((0, 0, 0), (6.4, 0.25, 2.8), (0.10, 0.15, 0.20)),
@@ -83,9 +85,9 @@ scene.cycles.samples = 64
 scene.cycles.use_denoising = True
 scene.render.resolution_x, scene.render.resolution_y = 1400, 900
 scene.render.film_transparent = False
-scene.view_settings.view_transform = "AgX"
+scene.view_settings.view_transform = "Standard"
 world = bpy.data.worlds.new("w"); scene.world = world; world.use_nodes = True
-world.node_tree.nodes["Background"].inputs[0].default_value = (0.004, 0.012, 0.022, 1)
+world.node_tree.nodes["Background"].inputs[0].default_value = (0.002, 0.002, 0.002, 1)
 world.node_tree.nodes["Background"].inputs[1].default_value = 1.0
 scene.view_settings.look = "AgX - Punchy" if "AgX - Punchy" in [l.name for l in []] else scene.view_settings.look
 # bloom via compositor
@@ -115,18 +117,19 @@ def material(name, rgb, rough=0.5, metal=0.0, emit=0.0, alpha=1.0):
     b.inputs["Alpha"].default_value = alpha
     return m
 
-GHOST = material("ghost", (0.02, 0.05, 0.08), 0.6, alpha=0.05)
+GHOST = material("ghost", (0.03, 0.03, 0.03), 0.6, alpha=0.05)
 HOLO_FILL = {}
 def holo_fill(rgb):
     k = tuple(round(c, 3) for c in rgb)
     if k not in HOLO_FILL:
-        HOLO_FILL[k] = material("fill%d" % len(HOLO_FILL), tuple(0.05 + c * 0.25 for c in rgb), 0.35, alpha=0.55)
+        lum = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+        HOLO_FILL[k] = material("fill%d" % len(HOLO_FILL), (0.03 + lum * 0.2,) * 3, 0.35, alpha=0.5)
     return HOLO_FILL[k]
-EDGE = material("edge", (0.25, 0.85, 1.0), 0.5, emit=7.0)
-EDGE_DIM = material("edge_dim", (0.20, 0.55, 0.75), 0.5, emit=0.22)
-PAD = material("pad", (1.0, 0.75, 0.35), 0.3, 0.5, emit=1.5)
-JOINT = material("joint", (1.0, 0.45, 0.08), 0.3, 0.0, emit=14.0)
-JOINT_DIM = material("joint_dim", (1.0, 0.55, 0.15), 0.4, alpha=0.25)
+EDGE = material("edge", (0.92, 0.92, 0.92), 0.5, emit=4.0)
+EDGE_DIM = material("edge_dim", (0.5, 0.5, 0.5), 0.5, emit=0.12)
+PAD = material("pad", (0.8, 0.8, 0.8), 0.3, 0.5, emit=0.8)
+JOINT = material("joint", ACCENT, 0.3, 0.0, emit=1.0)
+JOINT_DIM = material("joint_dim", ACCENT, 0.4, alpha=0.25)
 
 def add_box(name, center, size, mat):
     bpy.ops.mesh.primitive_cube_add(location=center)
@@ -144,10 +147,10 @@ def add_sphere(name, center, r, mat, scale=(1, 1, 1)):
 
 # ground
 bpy.ops.mesh.primitive_plane_add(size=60, location=(-1.5, -2, 0))
-g = bpy.context.object; g.location.z = -0.02; g.data.materials.append(material("mat", (0.006, 0.014, 0.022), 0.9))
+g = bpy.context.object; g.location.z = -0.02; g.data.materials.append(material("mat", (0.004, 0.004, 0.004), 0.9))
 bpy.ops.mesh.primitive_grid_add(x_subdivisions=61, y_subdivisions=61, size=60, location=(-1.5, -2, 0))
 gr = bpy.context.object; wm = gr.modifiers.new("w", "WIREFRAME"); wm.thickness = 0.015
-gr.data.materials.append(material("grid", (0.1, 0.45, 0.6), 0.5, emit=0.12))
+gr.data.materials.append(material("grid", (0.5, 0.5, 0.5), 0.5, emit=0.06))
 
 comp_objs = {k: [] for k in comps}
 edge_objs = {k: [] for k in comps}
@@ -214,7 +217,7 @@ def wire_curve(name, a, b, rgb):
         bv = V(q.x, q.y, q.z); sp.points[i].co = (bv.x, bv.y, bv.z, 1)
     sp.use_endpoint_u = True; sp.order_u = 4
     o = bpy.data.objects.new(name, cd); scene.collection.objects.link(o)
-    m = material(name, rgb, 0.4, emit=1.1); cd.materials.append(m); o["orig"] = m.name
+    m = material(name, rgb, 0.4, emit=2.2 if rgb == RED else 0.8); cd.materials.append(m); o["orig"] = m.name
     return o
 
 wire_objs = [(w, wire_curve(f"wire{i}", P[w[0]], P[w[1]], w[2])) for i, w in enumerate(W)]
@@ -229,8 +232,8 @@ for fp in ["/System/Library/Fonts/Supplemental/Arial Bold.ttf", "/System/Library
             FONT = bpy.data.fonts.load(fp); break
         except Exception:
             pass
-LABEL_MAT = material("labeltext", (0.6, 0.95, 1.0), 0.5, emit=4.0)
-LABEL_PIN = material("labelpin", (0.55, 0.92, 1.0), 0.5, emit=3.5)
+LABEL_MAT = material("labeltext", (0.95, 0.95, 0.95), 0.5, emit=3.0)
+LABEL_PIN = material("labelpin", (0.9, 0.9, 0.9), 0.5, emit=2.6)
 
 bpy.ops.object.camera_add(); cam = bpy.context.object; scene.camera = cam
 cam.data.lens = 40
@@ -238,7 +241,7 @@ target = bpy.data.objects.new("target", None); scene.collection.objects.link(tar
 tc = cam.constraints.new("TRACK_TO"); tc.target = target; tc.track_axis = "TRACK_NEGATIVE_Z"; tc.up_axis = "UP_Y"
 
 bpy.ops.object.light_add(type="AREA", location=(2, -6, 18)); key = bpy.context.object
-key.data.energy = 900; key.data.size = 14; key.data.color = (0.6, 0.85, 1.0)
+key.data.energy = 900; key.data.size = 14; key.data.color = (1.0, 1.0, 1.0)
 bpy.ops.object.light_add(type="SUN", location=(0, 0, 10), rotation=(0.6, 0.2, 0.8)); bpy.context.object.data.energy = 1.2
 
 def make_text(body_txt, loc, size, mat, name):
