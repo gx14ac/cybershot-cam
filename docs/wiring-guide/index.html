@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CyberShot Cam 配線・はんだガイド</title>
+<style>
+:root{
+  --bg:#111315; --bg2:#171a1d; --line:#2b3035; --line2:#3a4046;
+  --ink:#e8e4dc; --muted:#9a958b; --faint:#6c6861;
+  --amber:#f0a640; --cyan:#7fd4ec; --red:#ef6a6a; --green:#8fcf9a;
+  --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:var(--cyan)}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 20px 96px}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{color:var(--cyan)}
+
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
+header .kicker{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em;margin:0}
+header h1{font-size:28px;font-weight:600;letter-spacing:.02em;line-height:1.35;margin:6px 0 10px}
+header p{margin:0;max-width:68ch;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:500}
+.facts b.amber{color:var(--amber)}
+
+.bench{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+@media (max-width:860px){.bench{grid-template-columns:1fr;gap:16px}}
+.steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+@media (max-width:860px){.steps{display:flex;overflow-x:auto;border-top:none;gap:6px;padding-bottom:4px}}
+.steps li{border-bottom:1px solid var(--line)}
+@media (max-width:860px){.steps li{border:1px solid var(--line);flex:0 0 auto}}
+.steps button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:baseline;width:100%;padding:9px 8px 9px 4px;color:var(--muted)}
+@media (max-width:860px){.steps button{grid-template-columns:auto auto;padding:6px 10px}.steps .kind{display:none}}
+.steps button:hover{color:var(--ink)}
+.steps button:focus-visible{outline:1px solid var(--cyan);outline-offset:-1px}
+.steps button[aria-current="step"]{color:var(--ink);background:var(--bg2);box-shadow:inset 2px 0 0 var(--amber)}
+.steps .n{font-family:var(--mono);font-size:13px;color:var(--faint)}
+.steps [aria-current="step"] .n{color:var(--amber)}
+.steps .t{font-size:14px}
+.steps .kind{font-size:11px;color:var(--faint)}
+.steps .kind.solder{color:var(--amber);opacity:.85}
+
+figure{margin:0}
+.frame{position:relative;border:1px solid var(--line);background:#02070c;aspect-ratio:14/9}
+.frame img,.frame canvas{display:block;width:100%;height:100%;object-fit:cover}
+.frame [hidden]{display:none}
+.switch{position:absolute;right:10px;top:10px;display:flex;font-size:12px;border:1px solid var(--line2);background:rgba(10,12,14,.75)}
+.switch button{all:unset;cursor:pointer;padding:3px 10px;color:var(--muted)}
+.switch button[aria-pressed="true"]{color:var(--bg);background:var(--ink)}
+.switch button:focus-visible{outline:1px solid var(--cyan)}
+.hint{position:absolute;left:10px;bottom:8px;font-size:12px;color:var(--muted);background:rgba(10,12,14,.6);padding:0 6px}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding:8px 0 0;font-size:13px;color:var(--muted)}
+figcaption b{color:var(--ink);font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px}
+.sw{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:4px}
+.sw.dot{width:8px;height:8px;border-radius:50%;vertical-align:1px}
+
+.detail{margin-top:22px}
+.detail h2{font-size:19px;font-weight:600;margin:0 0 6px}
+.detail ol{margin:0;padding-left:1.4em}
+.detail li{margin:4px 0}
+.detail li::marker{color:var(--faint);font-family:var(--mono);font-size:13px}
+.detail b{color:#fff;font-weight:600}
+.joints{margin:12px 0 0;padding:8px 12px;border-left:2px solid var(--amber);background:rgba(240,166,64,.06);font-size:14px}
+.joints::before{content:"はんだ付け　";color:var(--amber)}
+.note{font-size:13px;color:var(--muted)}
+.warn{margin:12px 0 0;padding:8px 12px;border-left:2px solid var(--red);background:rgba(239,106,106,.07);font-size:14px}
+
+section{margin-top:64px}
+section > h2{display:flex;gap:12px;align-items:baseline;font-size:20px;font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+section > h2 .n{font-family:var(--mono);font-size:13px;color:var(--faint);font-weight:400}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;font-weight:500;color:var(--muted)}
+td.pin{font-family:var(--mono);font-size:13px;white-space:nowrap}
+td .sw{vertical-align:3px}
+.how{font-size:12px;white-space:nowrap;color:var(--muted)}
+.how.solder{color:var(--amber)}
+.ok{color:var(--green);white-space:nowrap}
+.chk{color:var(--amber);white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.cols h3{font-size:15px;font-weight:600;margin:0 0 6px}
+.cols ul,.plain{margin:0;padding-left:1.2em}
+.cols li,.plain li{margin:3px 0}
+.parts{columns:2;column-gap:40px;margin:0;padding-left:1.2em}
+@media (max-width:760px){.parts{columns:1}}
+.parts li{margin:3px 0;break-inside:avoid}
+.parts span{color:var(--muted);font-size:13px}
+footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--faint)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">ESP32-S3 WROOM CAM / ST7735 1.8" / KY-023 / 18650</p>
+  <h1>CyberShot Cam 配線・はんだガイド</h1>
+  <p>Freenove ESP32-S3 WROOM CAM（N16R8）で CyberShot Cam を組み立て、電池で動かすまでの手順です。手順を選ぶと、その手順で使う線と、はんだ付けする場所（オレンジの点）が図に出ます。「3D」に切り替えると、ドラッグで回して見られます。</p>
+  <div class="facts">
+    <span>はんだ付け <b class="amber" id="jointCount">–</b> か所</span>
+    <span>差すだけの線 <b id="jumpCount">–</b> 本</span>
+    <span>手順 <b>0〜8</b></span>
+    <span>電源 <b>18650 → 5.0V</b></span>
+  </div>
+</header>
+
+<div class="bench">
+  <ol class="steps" id="steps" aria-label="組み立て手順"></ol>
+  <div>
+    <figure>
+      <div class="frame">
+        <img id="renderImg" alt="">
+        <canvas id="gl" hidden aria-label="部品と配線の3D図。ドラッグで回転できる"></canvas>
+        <div class="switch" role="group" aria-label="表示の切り替え">
+          <button id="tabRender" type="button" aria-pressed="true">画像</button>
+          <button id="tabLive" type="button" aria-pressed="false">3D</button>
+        </div>
+        <span class="hint" id="hint" hidden>ドラッグで回転 ・ ホイールで拡大</span>
+      </div>
+      <figcaption>
+        <span id="caption">–</span>
+        <span class="legend">
+          <span><i class="sw" style="background:#ff5a62"></i>電源 +</span>
+          <span><i class="sw" style="background:#cfe0ea"></i>GND</span>
+          <span><i class="sw" style="background:#4fd8ff"></i>信号</span>
+          <span><i class="sw" style="background:#ffd24a"></i>抵抗→LED</span>
+          <span><i class="sw dot" style="background:#ffae42"></i>はんだ</span>
+        </span>
+      </figcaption>
+    </figure>
+    <div class="detail" id="detail" aria-live="polite"></div>
+  </div>
+</div>
+
+<section>
+  <h2><span class="n">1</span>配線表</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>部品</th><th>部品側の端子</th><th>つなぐ先</th><th>つなぎ方</th><th>手順</th></tr></thead>
+    <tbody id="wireTable"></tbody>
+  </table>
+  </div>
+  <p class="note">このボードの 3V3 と GND は1本ずつしかないので、「まとめ点」で分けます。まとめ点は、何本かの線をより合わせてはんだで1つにし、熱収縮チューブで覆ったものです。はんだが不安なら、レバー式のワイヤーコネクター（WAGO 221 など）でも作れます。</p>
+</section>
+
+<section>
+  <h2><span class="n">2</span>部品</h2>
+  <ul class="parts">
+    <li>Freenove ESP32-S3 WROOM CAM（N16R8、OV2640 付き）</li>
+    <li>1.8インチ SPI 液晶 ST7735（128×160）</li>
+    <li>ジョイスティック KY-023</li>
+    <li>丸い押しボタン（モーメンタリ）<span>シャッター</span></li>
+    <li>5mm 赤色 LED と 100Ω 抵抗 <span>フラッシュ</span></li>
+    <li>microSD カード</li>
+    <li>18650 電池と電池ホルダー</li>
+    <li>TP4056（保護回路付き、USB-C）<span>充電</span></li>
+    <li>MT3608 <span>5V への昇圧</span></li>
+    <li>ロッカースイッチ <span>電源</span></li>
+    <li>メス-メスのジャンパー線</li>
+    <li>テスター <span>5.0V の調整に使う</span></li>
+  </ul>
+  <p class="note">ほかに、はんだ（0.6〜0.8mm）、熱収縮チューブ、データ通信できる USB-C ケーブルがあると安心です。電池で動かしていて再起動するときは、MT3608 の出力側に 220〜470µF（10V 以上）の電解コンデンサを足してください。</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>はんだ付けが初めての人へ</h2>
+  <div class="cols">
+    <div>
+      <h3>1か所の流れ</h3>
+      <ul>
+        <li>こての温度は 320〜350℃ くらい。</li>
+        <li>こて先を、パッド（基板の金属部分）と線の両方に同時に当てて 2〜3 秒温める。</li>
+        <li>こて先ではなく、温めた部分にはんだを当てて溶かす。量は米粒くらい。</li>
+        <li>はんだを離してから、こてを離す。冷えるまで 3 秒ほど動かさない。</li>
+        <li>山の形でツヤがあれば成功。丸い玉やくすんだ色なら温め直す。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>この作業で気をつけること</h3>
+      <ul>
+        <li>TP4056 と MT3608 の端子は間隔が狭いので、隣とはんだでつながっていないか必ず見る。</li>
+        <li>線の先は 3〜4mm むいてより合わせ、先に少しはんだをなじませておく（予備はんだ）。</li>
+        <li>電池は、はんだ付けがすべて終わってから入れる。</li>
+        <li>はんだ付けしたところは、熱収縮チューブかビニールテープで覆う。</li>
+        <li>ジャンパー線を半分に切ると、片側がメスのまま残る「はんだ用の線」になる。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>プログラムとの照合</h2>
+  <p class="note">ピン番号は <code>src/main.cpp</code> と Freenove 公式のピン配置図で照らし合わせています。</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>項目</th><th>結果</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td>カメラのピン</td><td class="ok">一致</td><td>XCLK 15、SIOD 4、SIOC 5、D0〜D7、VSYNC 6、HREF 7、PCLK 13 の全14本が、公式ピン配置図の CAM_ 表記と一致（<code>main.cpp:61-76</code>）。作者のボードは GOOUUU 製 V1.3 だが、同じ系統のピン配置。</td></tr>
+      <tr><td>microSD</td><td class="ok">一致</td><td>CLK 39、CMD 38、D0 40 の1ビットモード。ボード上のスロットをそのまま使う（<code>main.cpp:2851-2852</code>）。</td></tr>
+      <tr><td>シャッターとジョイスティックの押し込み</td><td class="ok">抵抗不要</td><td>内部プルアップを使っている（<code>main.cpp:2830</code>、<code>2833</code>）。GND とつなぐだけで動く。</td></tr>
+      <tr><td>ジョイスティック（GPIO 1、2）</td><td class="ok">問題なし</td><td>ADC1 なので Wi-Fi 使用中でも読める。1000 未満と 3000 超えで判定する（<code>main.cpp:3381-3386</code>）ので、電源は必ず 3.3V。</td></tr>
+      <tr><td>PSRAM / Flash</td><td class="ok">一致</td><td><code>platformio.ini</code> の <code>qio_opi</code> と 16MB は N16R8 に合う。</td></tr>
+      <tr><td>ビルド</td><td class="ok">成功</td><td>PlatformIO 6.2.0 で RAM 30.7%、Flash 40.1%。ライブラリは ST7735 1.12.0、GFX 1.13.0、JPEGDEC 1.8.5 に固定。</td></tr>
+      <tr><td>GPIO 45（液晶 SDA）</td><td class="ok">問題なし</td><td>起動時の設定を決めるピンだが、液晶側は入力なので起動に影響しない。</td></tr>
+      <tr><td>3V3 / GND / 5V</td><td class="chk">各1本</td><td>3V3 は液晶とジョイスティック、GND は6か所で使うので、まとめ点で分ける。</td></tr>
+      <tr><td>液晶の初期化</td><td class="chk">要確認</td><td><code>INITR_BLACKTAB</code>（<code>main.cpp:2832</code>）。色が反転したり端に線が出たら <code>INITR_GREENTAB</code> などに変える。</td></tr>
+      <tr><td>シリアルログ</td><td class="chk">使えない</td><td>GPIO 43 を液晶の CS に使うため、USB シリアルは文字化けする。ログは Wi-Fi 接続後に <code>http://（カメラのIP）/log</code> で見る（<code>main.cpp:208-210</code>）。</td></tr>
+      <tr><td>GPIO 48（フラッシュ）</td><td class="chk">影響小</td><td>基板上の RGB LED（WS2812）もつながっているので、フラッシュのたびにボードの LED も光ることがある。</td></tr>
+      <tr><td>GPIO 2（ジョイスティック VRy）</td><td class="chk">影響小</td><td>基板上の LED もつながっていて、スティックを倒すと光ることがある。判定には影響しない見込み。</td></tr>
+      <tr><td>うまく動かないとき</td><td class="chk">参考</td><td>カメラの初期化に失敗すると「CAM FAIL」と出て3秒後に再起動（<code>main.cpp:2890-2895</code>）。画面が白いままなら液晶の SCK / SDA / CS / DC / RST を見直す。</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<footer>
+  CyberShot Cam のファームウェアは cebola4444 によるもの。このガイドの図は <code>docs/wiring-guide/render_steps.py</code>（Blender）で作っています。
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const RED=0xff5a62, GND=0xcfe0ea, SIG=0x4fd8ff, YEL=0xffd24a;
+
+const comps = {
+  board:{name:"ESP32-S3 BOARD", pos:[0,0,0], size:[6.4,0.25,2.8]},
+  lcd:{name:"LCD ST7735", pos:[-5.6,0,-6.2], size:[3.6,0.2,5.0]},
+  joy:{name:"JOYSTICK KY-023", pos:[5.6,0,-5.8], size:[2.6,0.2,3.4]},
+  btn:{name:"SHUTTER", pos:[6.2,0,5.2], size:[0,0,0]},
+  led:{name:"LED + 100Ω", pos:[2.4,0,6.4], size:[0,0,0]},
+  batt:{name:"18650 HOLDER", pos:[-9.2,0,7.2], size:[7.6,0.9,2.2]},
+  tp:{name:"TP4056", pos:[-3.2,0,7.2], size:[2.6,0.15,1.7]},
+  sw:{name:"POWER SW", pos:[0.2,0,9.6], size:[1.2,0.8,0.7]},
+  mt:{name:"MT3608 5V", pos:[-3.2,0,10.6], size:[3.6,0.15,1.7]},
+};
+const P = {};
+function addPin(id, comp, x, z, label){ const c=comps[comp]; P[id]={x:c.pos[0]+x, z:c.pos[2]+z, y:(c.size[1]||0.2)+0.05, label, comp}; }
+// Freenove ESP32-S3 WROOM header order (antenna end = +x, USB end = -x)
+const HDR_R=["43","44","1","2","42","41","40","39","38","37","36","35","0","45","48","47","21","20","19","GND"];
+const HDR_L=["3V3","RST","4","5","6","7","15","16","17","18","8","3","46","9","10","11","12","13","14","5V"];
+HDR_R.forEach((n,i)=>addPin("b"+n,"board",2.95-i*0.31,-1.15,n));
+HDR_L.forEach((n,i)=>addPin("b"+n,"board",2.95-i*0.31,1.15,n));
+["VCC","GND","CS","RESET","A0","SDA","SCK","LED"].forEach((n,i)=>addPin("l"+n,"lcd",-1.575+i*0.45,2.3,n));
+["GND","+5V","VRx","VRy","SW"].forEach((n,i)=>addPin("j"+n,"joy",-0.9+i*0.45,-1.5,n));
+addPin("btn1","btn",-0.35,0.75,"端子1"); addPin("btn2","btn",0.35,0.75,"端子2"); P.btn1.y=P.btn2.y=0.15;
+addPin("rA","led",-1.4,-0.9,"抵抗"); addPin("rB","led",-0.4,-0.3,"抵抗"); addPin("ledA","led",0.15,0.0,"長い足 +"); addPin("ledK","led",0.45,0.0,"短い足 -");
+["rA","rB","ledA","ledK"].forEach(k=>P[k].y=0.12);
+addPin("battP","batt",3.9,-0.45,"赤リード"); addPin("battN","batt",3.9,0.45,"黒リード"); P.battP.y=P.battN.y=0.5;
+addPin("tpBp","tp",-1.1,-0.45,"B+"); addPin("tpBn","tp",-1.1,0.45,"B-");
+addPin("tpOp","tp",1.1,-0.45,"OUT+"); addPin("tpOn","tp",1.1,0.45,"OUT-");
+addPin("sw1","sw",-0.3,-0.45,"SW"); addPin("sw2","sw",0.3,-0.45,"SW"); P.sw1.y=P.sw2.y=0.2;
+addPin("mtIp","mt",-1.6,-0.45,"VIN+"); addPin("mtIn","mt",-1.6,0.45,"VIN-");
+addPin("mtOp","mt",1.6,-0.45,"VOUT+"); addPin("mtOn","mt",1.6,0.45,"VOUT-");
+// the board has only one 3V3 and one GND pin, so wires meet at junctions
+addPin("bus3","board",4.7,-0.5,"3V3 まとめ点"); P.bus3.y=0.15; P.bus3.comp="bus";
+addPin("busG","board",-4.7,-0.5,"GND まとめ点"); P.busG.y=0.15; P.busG.comp="bus";
+
+// [from, to, color, step, j=jumper|s=solder, solder joints, part, part pin, destination]
+const W = [
+  ["b3V3","bus3",RED,1,"j",["bus3"], "ボード","3V3","3V3 まとめ点"],
+  ["bGND","busG",GND,1,"j",["busG"], "ボード","GND","GND まとめ点"],
+  ["lVCC","bus3",RED,1,"j",[], "液晶","VCC","3V3 まとめ点"],
+  ["lGND","busG",GND,1,"j",[], "液晶","GND","GND まとめ点"],
+  ["lCS","b43",SIG,1,"j",[], "液晶","CS","GPIO 43"],
+  ["lRESET","b21",SIG,1,"j",[], "液晶","RESET","GPIO 21"],
+  ["lA0","b14",SIG,1,"j",[], "液晶","A0（DC）","GPIO 14"],
+  ["lSDA","b45",SIG,1,"j",[], "液晶","SDA","GPIO 45"],
+  ["lSCK","b47",SIG,1,"j",[], "液晶","SCK","GPIO 47"],
+  ["lLED","lVCC",RED,1,"s",["lLED","lVCC"], "液晶","LED（バックライト）","液晶の VCC へ短い線で"],
+  ["j+5V","bus3",RED,2,"j",[], "ジョイスティック","+5V","3V3 まとめ点（5V ではない）"],
+  ["jGND","busG",GND,2,"j",[], "ジョイスティック","GND","GND まとめ点"],
+  ["jVRx","b1",SIG,2,"j",[], "ジョイスティック","VRx","GPIO 1"],
+  ["jVRy","b2",SIG,2,"j",[], "ジョイスティック","VRy","GPIO 2"],
+  ["jSW","b42",SIG,2,"j",[], "ジョイスティック","SW","GPIO 42"],
+  ["btn1","b41",SIG,3,"s",["btn1"], "シャッターボタン","端子1","GPIO 41"],
+  ["btn2","busG",GND,3,"s",["btn2"], "シャッターボタン","端子2","GND まとめ点"],
+  ["b48","rA",SIG,4,"s",["rA"], "フラッシュ LED","100Ω 抵抗の片側","GPIO 48"],
+  ["rB","ledA",YEL,4,"s",["rB","ledA"], "フラッシュ LED","抵抗のもう片側","LED の長い足（アノード）"],
+  ["ledK","busG",GND,4,"s",["ledK"], "フラッシュ LED","LED の短い足（カソード）","GND まとめ点"],
+  ["battP","tpBp",RED,5,"s",["tpBp"], "電池ホルダー","赤リード","TP4056 の B+"],
+  ["battN","tpBn",GND,5,"s",["tpBn"], "電池ホルダー","黒リード","TP4056 の B-"],
+  ["tpOp","sw1",RED,6,"s",["tpOp","sw1"], "TP4056","OUT+","電源スイッチの片側"],
+  ["sw2","mtIp",RED,6,"s",["sw2","mtIp"], "電源スイッチ","もう片側","MT3608 の VIN+"],
+  ["tpOn","mtIn",GND,6,"s",["tpOn","mtIn"], "TP4056","OUT-","MT3608 の VIN-"],
+  ["mtOp","b5V",RED,8,"s",["mtOp"], "MT3608","VOUT+","ボードの 5V"],
+  ["mtOn","busG",GND,8,"s",["mtOn"], "MT3608","VOUT-","GND まとめ点"],
+];
+
+const STEPS = [
+  {n:0, t:"ボードだけで書き込む", kind:"prep", focus:["board"], body:`
+   <h2>0. ボードだけで書き込む</h2>
+   <ol><li>まだ何もつながず、ボードだけを USB-C ケーブルでパソコンにつなぎます。</li>
+   <li>PlatformIO でビルドして書き込みます（<code>pio run -t upload</code>）。</li>
+   <li>microSD を挿し、カメラのケーブルがしっかり刺さっているか確かめます。</li></ol>
+   <p class="note">画面がまだないので、ここでは書き込みが成功すれば十分です。</p>`},
+  {n:1, t:"液晶", kind:"plug", focus:["lcd","board"], body:`
+   <h2>1. 液晶（8本）</h2>
+   <ol><li><b>このボードは 3V3 と GND のピンが1本ずつしかありません。</b>先にジャンパー線を半分に切って「3V3 まとめ点」と「GND まとめ点」を作り、ボードの 3V3 と GND から1本ずつつなぎます。</li>
+   <li>液晶の VCC と GND を、それぞれのまとめ点へ。</li>
+   <li>信号の5本はメス-メスのジャンパー線で直接つなぎます。CS→43、RESET→21、A0→14、SDA→45、SCK→47。</li>
+   <li><b>LED（バックライト）</b>は、液晶の VCC と短い線ではんだでつなぎます。</li>
+   <li>液晶にピンヘッダが付いていなければ、先に8本のピンをはんだ付けします。</li>
+   <li>USB をつないで起動画面が出れば成功です。</li></ol>
+   <p class="joints">LED と VCC、3V3 まとめ点、GND まとめ点</p>`},
+  {n:2, t:"ジョイスティック", kind:"plug", focus:["joy","board"], body:`
+   <h2>2. ジョイスティック（5本）</h2>
+   <ol><li><b>+5V と書かれた端子は 3V3 まとめ点へ。</b>5V につなぐと読み取れる範囲を超えます。</li>
+   <li>GND→GND まとめ点、VRx→GPIO 1、VRy→GPIO 2、SW→GPIO 42。</li>
+   <li>スティックを倒すとボードの LED が光ることがありますが、故障ではありません。</li>
+   <li>メニューの上下が逆なら、ジョイスティックを 180° 回して付けます。</li></ol>
+   <p class="joints">+5V と GND の線を、それぞれのまとめ点に足す</p>`},
+  {n:3, t:"シャッターボタン", kind:"solder", focus:["btn","board"], body:`
+   <h2>3. シャッターボタン</h2>
+   <ol><li>ジャンパー線を2本、半分に切ります。</li>
+   <li>ボタンの2つの端子に1本ずつはんだ付けします。向きはどちらでも構いません。</li>
+   <li>片方を GPIO 41、もう片方を GND まとめ点へ。</li></ol>
+   <p class="joints">ボタンの端子 2か所</p>`},
+  {n:4, t:"フラッシュ LED", kind:"solder", focus:["led","board"], body:`
+   <h2>4. フラッシュ LED と 100Ω 抵抗</h2>
+   <ol><li>LED の<b>長い足（アノード）</b>に 100Ω 抵抗をはんだ付けします。逆だと光りません。</li>
+   <li>抵抗のもう片側に切ったジャンパー線を付けて、GPIO 48 へ。</li>
+   <li>LED の<b>短い足（カソード）</b>に線を付けて、GND まとめ点へ。</li>
+   <li>むき出しの部分を熱収縮チューブで覆います。</li></ol>
+   <p class="joints">抵抗と線、抵抗と LED、LED と線の 3か所、GND まとめ点への追加</p>`},
+  {n:5, t:"電池 → TP4056", kind:"solder", focus:["batt","tp"], body:`
+   <h2>5. 電池ホルダーを TP4056 へ</h2>
+   <ol><li><b>電池はまだ入れません。</b></li>
+   <li>電池ホルダーの赤い線を TP4056 の <b>B+</b>、黒い線を <b>B-</b> にはんだ付けします。</li>
+   <li>保護回路付きの TP4056 なら、過充電・過放電・過電流から電池を守ってくれます。</li></ol>
+   <p class="joints">B+ と B- の 2か所</p>`},
+  {n:6, t:"スイッチと MT3608", kind:"solder", focus:["tp","sw","mt"], body:`
+   <h2>6. 電源スイッチと MT3608</h2>
+   <ol><li>TP4056 の <b>OUT+</b> → 電源スイッチ → MT3608 の <b>VIN+</b>。</li>
+   <li>TP4056 の <b>OUT-</b> → MT3608 の <b>VIN-</b>。</li>
+   <li>保護回路は OUT 側に効くので、電気は必ず OUT+ / OUT- から取ります。</li></ol>
+   <p class="joints">OUT+、スイッチ 2か所、VIN+、OUT-、VIN- の 6か所</p>`},
+  {n:7, t:"5.0V に合わせる", kind:"prep", focus:["mt"], body:`
+   <h2>7. ボードにつなぐ前に 5.0V に合わせる</h2>
+   <ol><li>電池を入れ、スイッチをオンにします。</li>
+   <li>テスターを直流 20V のレンジにして、MT3608 の VOUT+ と VOUT- に当てます。</li>
+   <li>青い可変抵抗を小さなドライバーで回して <b>5.0V</b> に合わせます。最初は10回以上回さないと変わらないことがあります。</li>
+   <li>合わせたらスイッチをオフにします。</li></ol>
+   <p class="warn">5.5V を超えたままボードにつなぐと、ボードが壊れることがあります。</p>`},
+  {n:8, t:"MT3608 → ボード", kind:"solder", focus:["mt","board"], body:`
+   <h2>8. 電源をボードへ</h2>
+   <ol><li>MT3608 の VOUT+ をボードの <b>5V</b> へ、VOUT- を <b>GND まとめ点</b>へ。</li>
+   <li><b>USB で書き込むときは、電源スイッチをオフに。</b></li>
+   <li><b>充電するときも、スイッチをオフに</b>してから TP4056 の USB-C に挿します。</li></ol>
+   <p class="joints">VOUT+ と VOUT- の 2か所</p>`},
+  {n:9, t:"全体", kind:"all", all:true, focus:[], body:`
+   <h2>全体図</h2>
+   <p>オレンジの点がはんだ付けする場所です。ボードのピンは Freenove 公式のピン配置図の並び（右がアンテナ側、左が USB 側）です。実物でも、ボードの印字を見ながらつないでください。</p>`},
+];
+const kindLabel={solder:"はんだ",plug:"差す",prep:"準備",all:""};
+
+/* counts & table */
+const jointSet=new Set(); W.forEach(w=>w[5].forEach(j=>jointSet.add(j)));
+document.getElementById("jointCount").textContent = jointSet.size;
+document.getElementById("jumpCount").textContent = W.filter(w=>w[4]==="j").length;
+const hex=c=>"#"+c.toString(16).padStart(6,"0");
+const tb=document.getElementById("wireTable");
+W.forEach(w=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td>${w[6]}</td><td class="pin">${w[7]}</td><td class="pin"><i class="sw" style="background:${hex(w[2])}"></i>${w[8]}</td><td class="how ${w[4]==="s"?"solder":""}">${w[4]==="s"?"はんだ":"ジャンパー線"}</td><td class="pin">${w[3]}</td>`;
+  tb.appendChild(tr);
+});
+
+/* step list */
+const stepsEl=document.getElementById("steps"), detail=document.getElementById("detail");
+STEPS.forEach((s,i)=>{
+  const li=document.createElement("li"), b=document.createElement("button"); b.type="button";
+  b.innerHTML=`<span class="n">${s.all?"–":s.n}</span><span class="t">${s.t}</span><span class="kind ${s.kind}">${kindLabel[s.kind]}</span>`;
+  b.addEventListener("click",()=>select(i)); li.appendChild(b); stepsEl.appendChild(li);
+});
+
+/* image / 3D switch */
+const tabR=document.getElementById("tabRender"), tabL=document.getElementById("tabLive");
+const img=document.getElementById("renderImg"), canvas=document.getElementById("gl"), hint=document.getElementById("hint");
+let mode="render";
+function setMode(m){ mode=m; tabR.setAttribute("aria-pressed",m==="render"); tabL.setAttribute("aria-pressed",m==="live");
+  img.hidden=m!=="render"; canvas.hidden=hint.hidden=m!=="live"; if(m==="live") resize(); }
+tabR.addEventListener("click",()=>{ if(STEPS[current].all) return; setMode("render"); });
+tabL.addEventListener("click",()=>setMode("live"));
+
+/* three.js hologram scene */
+let renderer, scene, camera, controls, wireObjs=[], jointObjs=[], compObjs={}, pinLabels=[];
+const has3D=!!window.THREE;
+function label(text,size,color){
+  const c=document.createElement("canvas"), g=c.getContext("2d"); const fs=46;
+  const font=`500 ${fs}px ui-monospace,Menlo,"Hiragino Sans",monospace`;
+  g.font=font; const w=Math.ceil(g.measureText(text).width)+30; c.width=w; c.height=fs+22; g.font=font;
+  g.fillStyle="rgba(2,12,20,0.82)"; g.fillRect(0,0,w,c.height);
+  g.strokeStyle=color||"#4fd8ff"; g.lineWidth=3; g.strokeRect(1.5,1.5,w-3,c.height-3);
+  g.fillStyle=color||"#bff0ff"; g.textBaseline="middle"; g.fillText(text,15,c.height/2+2);
+  const t=new THREE.CanvasTexture(c); t.minFilter=THREE.LinearFilter;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));
+  sp.scale.set(size*w/c.height,size,1); sp.renderOrder=10; return sp;
+}
+if(has3D){
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x01060b); scene.fog=new THREE.Fog(0x01060b,28,60);
+  camera=new THREE.PerspectiveCamera(40,14/9,0.1,200); camera.position.set(-2,17,19);
+  controls=new THREE.OrbitControls(camera,canvas); controls.target.set(-1.5,0,2); controls.enableDamping=true; controls.maxPolarAngle=Math.PI*0.48;
+  scene.add(new THREE.AmbientLight(0x88ccff,0.5));
+  const dl=new THREE.DirectionalLight(0xbfe9ff,0.6); dl.position.set(5,12,6); scene.add(dl);
+  const grid=new THREE.GridHelper(60,60,0x1d6f8c,0x0c3346); grid.position.set(-1.5,0,2); scene.add(grid);
+
+  function holo(geom, y){
+    const g=new THREE.Group();
+    const fill=new THREE.Mesh(geom,new THREE.MeshPhongMaterial({color:0x0b3550,transparent:true,opacity:0.35,emissive:0x06283a,shininess:80,depthWrite:false}));
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geom),new THREE.LineBasicMaterial({color:0x4fd8ff,transparent:true,opacity:0.95}));
+    g.add(fill); g.add(edges); g.position.y=y||0; g.userData.edge=edges; g.userData.fill=fill; return g;
+  }
+  Object.entries(comps).forEach(([id,c])=>{
+    const root=new THREE.Group(); root.position.set(c.pos[0],0,c.pos[2]); const parts=[];
+    const add=(geom,x,y,z,rx,rz)=>{ const h=holo(geom,y); h.position.x=x||0; h.position.z=z||0; if(rx) h.rotation.x=rx; if(rz) h.rotation.z=rz; root.add(h); parts.push(h); };
+    if(c.size[0]) add(new THREE.BoxGeometry(...c.size),0,c.size[1]/2,0);
+    if(id==="board"){ add(new THREE.BoxGeometry(2.2,0.35,1.7),1.6,0.42,0); add(new THREE.BoxGeometry(0.9,0.5,0.9),-0.7,0.5,0); add(new THREE.CylinderGeometry(0.25,0.25,0.2,16),-0.7,0.85,0); add(new THREE.BoxGeometry(0.8,0.3,0.6),-3.1,0.4,0); }
+    if(id==="lcd") add(new THREE.BoxGeometry(3.0,0.06,3.6),0,0.23,-0.3);
+    if(id==="joy"){ add(new THREE.BoxGeometry(1.6,0.9,1.6),0,0.65,0.3); add(new THREE.SphereGeometry(0.55,14,8),0,1.9,0.3); }
+    if(id==="btn"){ add(new THREE.CylinderGeometry(0.6,0.6,0.8,20),0,0.4,0); add(new THREE.CylinderGeometry(0.47,0.5,0.35,20),0,0.95,0); }
+    if(id==="led"){ add(new THREE.CylinderGeometry(0.13,0.13,0.9,10),-0.9,0.12,-0.6,0,Math.PI/2); add(new THREE.CylinderGeometry(0.25,0.25,0.6,12),0.3,0.5,-0.25); }
+    if(id==="batt") add(new THREE.CylinderGeometry(0.9,0.9,6.5,18),0,0.95,0,0,Math.PI/2);
+    if(id==="mt") add(new THREE.BoxGeometry(0.6,0.5,0.6),0,0.4,-0.3);
+    if(id==="tp") add(new THREE.BoxGeometry(0.7,0.3,0.5),0,0.3,-0.85);
+    if(id==="sw") add(new THREE.BoxGeometry(0.9,0.25,0.5),0,0.9,0);
+    scene.add(root);
+    const lb=label(c.name,0.5); lb.position.set(c.pos[0],(c.size[1]||0.8)+1.7,c.pos[2]-(c.size[2]||1)/2-0.2); scene.add(lb);
+    compObjs[id]={parts,label:lb};
+  });
+  Object.entries(P).forEach(([id,p])=>{ if(p.comp==="bus") return;
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.06,12),new THREE.MeshBasicMaterial({color:0xffcf8a,transparent:true}));
+    m.position.set(p.x,p.y-0.02,p.z); scene.add(m); });
+  function wirePath(a,b){
+    const pa=new THREE.Vector3(a.x,a.y,a.z), pb=new THREE.Vector3(b.x,b.y,b.z);
+    const d=pa.distanceTo(pb), h=Math.min(2.6,0.5+d*0.14);
+    const m1=pa.clone().lerp(pb,0.25); m1.y=Math.max(pa.y,pb.y)+h; const m2=pa.clone().lerp(pb,0.75); m2.y=Math.max(pa.y,pb.y)+h;
+    return new THREE.CatmullRomCurve3([pa,new THREE.Vector3(pa.x,pa.y+0.35,pa.z),m1,m2,new THREE.Vector3(pb.x,pb.y+0.35,pb.z),pb]);
+  }
+  wireObjs=W.map(w=>{ const path=wirePath(P[w[0]],P[w[1]]);
+    const core=new THREE.Mesh(new THREE.TubeGeometry(path,48,0.06,8,false),new THREE.MeshBasicMaterial({color:w[2],transparent:true}));
+    const glow=new THREE.Mesh(new THREE.TubeGeometry(path,48,0.16,8,false),new THREE.MeshBasicMaterial({color:w[2],transparent:true,opacity:0.18,blending:THREE.AdditiveBlending,depthWrite:false}));
+    scene.add(core); scene.add(glow); return {w,core,glow}; });
+  jointObjs=[...jointSet].map(id=>{ const p=P[id];
+    const m=new THREE.Mesh(new THREE.SphereGeometry(0.18,16,12),new THREE.MeshBasicMaterial({color:0xffae42,transparent:true}));
+    const halo=new THREE.Mesh(new THREE.SphereGeometry(0.42,16,12),new THREE.MeshBasicMaterial({color:0xff8a1a,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending,depthWrite:false}));
+    m.position.set(p.x,p.y+0.08,p.z); halo.position.copy(m.position); scene.add(m); scene.add(halo); return {id,m,halo}; });
+} else {
+  tabL.disabled=true; tabL.title="3D 表示を読み込めませんでした";
+}
+
+function resize(){ if(!has3D) return; const w=canvas.clientWidth,h=canvas.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+window.addEventListener("resize",resize);
+
+let current=1;
+function select(i){
+  current=i; const s=STEPS[i];
+  document.querySelectorAll(".steps button").forEach((b,k)=>{ if(k===i) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
+  detail.innerHTML=s.body;
+  const active=w=>s.all || w[3]===s.n;
+  const actWires=W.filter(active);
+  const actJoints=new Set(); actWires.forEach(w=>w[5].forEach(j=>actJoints.add(j)));
+  document.getElementById("caption").innerHTML = s.all
+    ? `<b>全体図</b>　はんだ ${actJoints.size}か所 ・ 線 ${actWires.length}本`
+    : `<b>手順 ${s.n}　${s.t}</b>　` + (actWires.length ? `はんだ ${actJoints.size}か所 ・ 線 ${actWires.length}本` : `配線なし`);
+  if(s.all && has3D){ setMode("live"); }
+  else { img.src="img/step"+(s.all?8:s.n)+".jpg"; img.alt="手順"+s.n+"「"+s.t+"」の配線図"; }
+  if(has3D){
+    wireObjs.forEach(({w,core,glow})=>{ const on=active(w); core.material.opacity=on?1:0.06; glow.material.opacity=on?0.22:0; });
+    jointObjs.forEach(({id,m,halo})=>{ const on=actJoints.has(id); m.visible=halo.visible=on; m.userData.pulse=on; });
+    const focus=new Set(s.focus);
+    Object.entries(compObjs).forEach(([id,o])=>{ const on=s.all||focus.has(id)||actWires.some(w=>P[w[0]].comp===id||P[w[1]].comp===id);
+      o.parts.forEach(g=>{ g.userData.edge.material.opacity=on?0.95:0.15; g.userData.fill.material.opacity=on?0.35:0.04; });
+      o.label.material.opacity=on?1:0.2; });
+    pinLabels.forEach(l=>scene.remove(l)); pinLabels=[];
+    if(!s.all){ const ids=new Set(); actWires.forEach(w=>{ids.add(w[0]); ids.add(w[1]);});
+      ids.forEach(id=>{ const p=P[id]; if(!p) return; const isB=p.comp==="board";
+        const l=label(isB?(/^\d+$/.test(p.label)?"GPIO "+p.label:p.label):p.label,0.36,isB?"#ffcf8a":"#bff0ff");
+        l.position.set(p.x,p.y+0.75,p.z+(isB?(p.z<0?-0.55:0.55):-0.5)); scene.add(l); pinLabels.push(l); }); }
+  }
+  try{ localStorage.setItem("cybershot-step",String(i)); }catch(e){}
+}
+
+const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tick(t){ if(has3D && mode==="live"){ controls.update();
+    if(!reduce) jointObjs.forEach(({m,halo})=>{ const k=m.userData.pulse?1+0.3*Math.sin(t/200):1; halo.scale.set(k,k,k); });
+    renderer.render(scene,camera); }
+  requestAnimationFrame(tick); }
+requestAnimationFrame(tick);
+
+let start=1; try{ const v=parseInt(localStorage.getItem("cybershot-step")); if(!isNaN(v)&&v>=0&&v<STEPS.length) start=v; }catch(e){}
+select(start);
+})();
+</script>
+</body>
+</html>
