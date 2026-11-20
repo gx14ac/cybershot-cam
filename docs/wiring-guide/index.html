@@ -250,6 +250,40 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-s
   </div>
 </section>
 
+<section>
+  <h2><span class="n">05</span>これからの進め方</h2>
+  <p class="note">部品は 2026/11/20 に注文済み。届いた順に進める。</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>時期</th><th>届くもの</th><th>やること</th></tr></thead>
+    <tbody>
+      <tr><td class="pin">11/21</td><td>ボード、テスター、LED、抵抗、ボタン、スイッチ、ジャンパー線、TP4056 / MT3608</td><td>手順0。ボードだけ USB-C でつないで <code>pio run -t upload</code>。書き込みが通れば OK。付属の microSD を挿して、カメラのケーブルの向きも見ておく。</td></tr>
+      <tr><td class="pin">12/8</td><td>18650 電池</td><td>手順5〜7。電池ホルダーを TP4056 へ、スイッチと MT3608 をつなぐ。テスターで 5.0V に合わせる。ボードにはまだつながない。</td></tr>
+      <tr><td class="pin">12/20〜25</td><td>液晶、ジョイスティック</td><td>手順1〜4 と 8。全部つないで電池で起動する。起動画面が出たら完成。</td></tr>
+      <tr><td class="pin">そのあと</td><td>—</td><td>外側をどうするか決める。作者みたいに L 字金具とボルトで枠を組むのが手軽そう。</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="cols" style="margin-top:20px">
+    <div>
+      <h3>決めていること</h3>
+      <ul>
+        <li>線の色は、電源が赤、GND が黒、信号が緑。</li>
+        <li>3V3 と GND はまとめ点で分ける。</li>
+        <li>書き込みと充電のときは電源スイッチを切る。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>届いてから確かめること</h3>
+      <ul>
+        <li>液晶の色やずれ。おかしければ <code>INITR_BLACKTAB</code> を <code>INITR_GREENTAB</code> などに変える。</li>
+        <li>液晶にピンヘッダが付いているか。</li>
+        <li>電池で動かして再起動するようなら、MT3608 の出力に 220〜470µF のコンデンサを足す。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <footer>
   <span>ファームウェア：cebola4444 / CyberShot Cam</span>
   <span>図：<code>docs/wiring-guide/render_steps.py</code>（Blender）</span>
