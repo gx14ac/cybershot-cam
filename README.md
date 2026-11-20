@@ -57,6 +57,14 @@ pio run -t upload    # flash over USB-C
 
 Turn the power switch off while the board is on USB.
 
+To test the bare board before the LCD and joystick are wired, flash the `bench` build:
+
+```sh
+pio run -e bench -t upload
+```
+
+It opens an open access point called `CYBERSHOT` at boot (when no Wi-Fi is saved) and ignores the joystick in the viewfinder. Join it and open `http://192.168.4.1/log` for the boot log, or `/galeria` for the photos. To take a photo, briefly connect GPIO 41 to GND with a jumper wire.
+
 GPIO 43 is both the serial TX pin and the LCD CS pin, so the serial monitor shows garbage. Read the log at `http://<camera-ip>/log` instead.
 
 ## Controls
@@ -97,6 +105,7 @@ The menu has:
 - `platformio.ini`
   - removed the Windows-only `build_dir`
   - pinned the library versions: Adafruit ST7735 1.12.0, Adafruit GFX 1.13.0, JPEGDEC 1.8.5
+  - `bench` environment for testing the bare board (`BENCH_AP`, `BENCH_NO_JOY` in `src/main.cpp`)
 - `docs/wiring-guide/`
   - step-by-step wiring guide (served on GitHub Pages)
   - `render_steps.py`, the Blender script that renders the guide images

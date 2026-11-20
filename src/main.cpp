@@ -510,6 +510,7 @@ void handlePresets();
 void handlePreset();
 
 void setupWebServer();   // forward declaration
+void switchToDirectAP(); // forward declaration (BENCH_AP)
 
 // ─── NVS: salvar/carregar credenciais ────────────────────────────────────────
 
@@ -715,6 +716,11 @@ void setupWiFi() {
         tft.setTextColor(ST77XX_YELLOW);
         tft.setCursor(8, 50);
         tft.print("WIFI not configured");
+#ifdef BENCH_AP
+        // bench: open the CYBERSHOT access point so /log and the gallery work without the LCD
+        switchToDirectAP();
+        dlog("[BENCH] AP CYBERSHOT %s", WiFi.softAPIP().toString().c_str());
+#endif
         return;
     }
 
@@ -735,6 +741,10 @@ void setupWiFi() {
     } else {
         WiFi.disconnect(true);
         dlog("[WIFI] fail");
+#ifdef BENCH_AP
+        switchToDirectAP();
+        dlog("[BENCH] AP CYBERSHOT %s", WiFi.softAPIP().toString().c_str());
+#endif
         tft.setTextColor(ST77XX_YELLOW);
         tft.print("WIFI failed");
     }
@@ -3440,6 +3450,9 @@ void handleMenuInput() {
 
 void handleVfInput() {
     static unsigned long lastMove = 0;
+#ifdef BENCH_NO_JOY
+    return;   // bench: joystick not wired, the floating ADC would move the EV
+#endif
     if (appState != STATE_VF) return;
     if (millis() - lastMove < 300) return;
 
