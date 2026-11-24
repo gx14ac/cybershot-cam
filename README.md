@@ -10,6 +10,8 @@ The firmware is by [cebola4444](https://github.com/cebola4444/cybershot-cam) (@c
 
 **Wiring guide:** https://gx14ac.github.io/cybershot-cam/wiring-guide/ (Japanese)
 
+**LCD notes:** [docs/lcd.md](docs/lcd.md) (Japanese): replacement module, pin names, init quirks
+
 ## Hardware
 
 | Part | Notes |
