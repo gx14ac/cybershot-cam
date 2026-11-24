@@ -184,7 +184,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-s
   <h2><span class="n">02</span>部品</h2>
   <ul class="parts">
     <li>Freenove ESP32-S3 WROOM CAM（N16R8、OV2640 付き）</li>
-    <li>1.8インチ SPI 液晶 ST7735（128×160）</li>
+    <li>1.8インチ SPI 液晶 ST7735S（128×160、WINGONEER）</li>
     <li>ジョイスティック KY-023</li>
     <li>丸い押しボタン（モーメンタリ）<span>シャッター</span></li>
     <li>5mm 赤色 LED と 100Ω 抵抗 <span>フラッシュ</span></li>
@@ -240,11 +240,11 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-s
       <tr><td>ビルド</td><td class="ok">成功</td><td>PlatformIO 6.2.0 で RAM 30.7%、Flash 40.1%。ライブラリは ST7735 1.12.0、GFX 1.13.0、JPEGDEC 1.8.5 に固定。</td></tr>
       <tr><td>GPIO 45（液晶 SDA）</td><td class="ok">問題なし</td><td>起動時の設定を決めるピンだが、液晶側は入力なので起動に影響しない。</td></tr>
       <tr><td>3V3 / GND / 5V</td><td class="chk">各1本</td><td>3V3 は液晶とジョイスティック、GND は6か所で使うので、まとめ点で分ける。</td></tr>
-      <tr><td>液晶の初期化</td><td class="chk">要確認</td><td><code>INITR_BLACKTAB</code>（<code>main.cpp:2832</code>）。色が反転したり端に線が出たら <code>INITR_GREENTAB</code> などに変える。</td></tr>
+      <tr><td>液晶の初期化</td><td class="chk">要確認</td><td><code>INITR_BLACKTAB</code>（<code>main.cpp:2832</code>）。この液晶は右端と下端にノイズが出るという報告あり。<code>INITR_GREENTAB</code> にすると端は直るが赤と青が入れ替わる（<code>docs/lcd.md</code>）。</td></tr>
       <tr><td>シリアルログ</td><td class="chk">使えない</td><td>GPIO 43 を液晶の CS に使うため、USB シリアルは文字化けする。ログは Wi-Fi 接続後に <code>http://（カメラのIP）/log</code> で見る（<code>main.cpp:208-210</code>）。</td></tr>
       <tr><td>GPIO 48（フラッシュ）</td><td class="chk">影響小</td><td>基板上の RGB LED（WS2812）もつながっているので、フラッシュのたびにボードの LED も光ることがある。</td></tr>
       <tr><td>GPIO 2（ジョイスティック VRy）</td><td class="chk">影響小</td><td>基板上の LED もつながっていて、スティックを倒すと光ることがある。判定には影響しない見込み。</td></tr>
-      <tr><td>うまく動かないとき</td><td class="chk">参考</td><td>カメラの初期化に失敗すると「CAM FAIL」と出て3秒後に再起動（<code>main.cpp:2890-2895</code>）。画面が白いままなら液晶の SCK / SDA / CS / DC / RST を見直す。</td></tr>
+      <tr><td>うまく動かないとき</td><td class="chk">参考</td><td>カメラの初期化に失敗すると「CAM FAIL」と出て3秒後に再起動（<code>main.cpp:2890-2895</code>）。画面が白いままなら液晶の SCL / SDA / RES / DC / CS を見直す。</td></tr>
     </tbody>
   </table>
   </div>
@@ -252,14 +252,15 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-s
 
 <section>
   <h2><span class="n">05</span>これからの進め方</h2>
-  <p class="note">部品は 2026/11/20 に注文済み。届いた順に進める。</p>
+  <p class="note">部品は 2026/11/20 に注文済み。液晶は出品者都合でキャンセルになり、11/24 に WINGONEER の ST7735S を頼み直した。届いた順に進める。</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>時期</th><th>届くもの</th><th>やること</th></tr></thead>
     <tbody>
-      <tr><td class="pin">11/21</td><td>ボード、テスター、LED、抵抗、ボタン、スイッチ、ジャンパー線、TP4056 / MT3608</td><td>手順0。ボードだけ USB-C でつないで <code>pio run -t upload</code>。書き込みが通れば OK。付属の microSD を挿して、カメラのケーブルの向きも見ておく。</td></tr>
+      <tr><td class="pin">11/21</td><td>ボード、テスター、LED、抵抗、ボタン、スイッチ、ジャンパー線、TP4056 / MT3608</td><td>手順0。ボードだけ USB-C でつないで <code>pio run -e bench -t upload</code>。スマホで <code>CYBERSHOT</code> につなぎ、<code>192.168.4.1/log</code> で SD とカメラが起動したか見る。GPIO 41 と GND を一瞬つなぐと撮れる。</td></tr>
+      <tr><td class="pin">11/25ごろ</td><td>液晶（WINGONEER）</td><td>手順1。液晶だけつないで通常版（<code>pio run -t upload</code>）を書き込み、起動画面を見る。色と端のノイズを確かめる。</td></tr>
       <tr><td class="pin">12/8</td><td>18650 電池</td><td>手順5〜7。電池ホルダーを TP4056 へ、スイッチと MT3608 をつなぐ。テスターで 5.0V に合わせる。ボードにはまだつながない。</td></tr>
-      <tr><td class="pin">12/20〜25</td><td>液晶、ジョイスティック</td><td>手順1〜4 と 8。全部つないで電池で起動する。起動画面が出たら完成。</td></tr>
+      <tr><td class="pin">12/20〜25</td><td>ジョイスティック</td><td>手順2〜4 と 8。全部つないで電池で起動する。起動画面が出たら完成。</td></tr>
       <tr><td class="pin">そのあと</td><td>—</td><td>外側をどうするか決める。作者みたいに L 字金具とボルトで枠を組むのが手軽そう。</td></tr>
     </tbody>
   </table>
@@ -276,8 +277,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line2);font-s
     <div>
       <h3>届いてから確かめること</h3>
       <ul>
-        <li>液晶の色やずれ。おかしければ <code>INITR_BLACKTAB</code> を <code>INITR_GREENTAB</code> などに変える。</li>
-        <li>液晶にピンヘッダが付いているか。</li>
+        <li>液晶の色と端のノイズ。直し方は <code>docs/lcd.md</code>。</li>
         <li>電池で動かして再起動するようなら、MT3608 の出力に 220〜470µF のコンデンサを足す。</li>
       </ul>
     </div>
@@ -314,7 +314,7 @@ const HDR_R=["43","44","1","2","42","41","40","39","38","37","36","35","0","45",
 const HDR_L=["3V3","RST","4","5","6","7","15","16","17","18","8","3","46","9","10","11","12","13","14","5V"];
 HDR_R.forEach((n,i)=>addPin("b"+n,"board",2.95-i*0.31,-1.15,n));
 HDR_L.forEach((n,i)=>addPin("b"+n,"board",2.95-i*0.31,1.15,n));
-["VCC","GND","CS","RESET","A0","SDA","SCK","LED"].forEach((n,i)=>addPin("l"+n,"lcd",-1.575+i*0.45,2.3,n));
+["GND","VCC","SCL","SDA","RES","DC","CS","BL"].forEach((n,i)=>addPin("l"+n,"lcd",-1.575+i*0.45,2.3,n));
 ["GND","+5V","VRx","VRy","SW"].forEach((n,i)=>addPin("j"+n,"joy",-0.9+i*0.45,-1.5,n));
 addPin("btn1","btn",-0.35,0.75,"端子1"); addPin("btn2","btn",0.35,0.75,"端子2"); P.btn1.y=P.btn2.y=0.15;
 addPin("rA","led",-1.4,-0.9,"抵抗"); addPin("rB","led",-0.4,-0.3,"抵抗"); addPin("ledA","led",0.15,0.0,"長い足 +"); addPin("ledK","led",0.45,0.0,"短い足 -");
@@ -335,12 +335,12 @@ const W = [
   ["bGND","busG",GND,1,"j",["busG"], "ボード","GND","GND まとめ点"],
   ["lVCC","bus3",RED,1,"j",[], "液晶","VCC","3V3 まとめ点"],
   ["lGND","busG",GND,1,"j",[], "液晶","GND","GND まとめ点"],
-  ["lCS","b43",SIG,1,"j",[], "液晶","CS","GPIO 43"],
-  ["lRESET","b21",SIG,1,"j",[], "液晶","RESET","GPIO 21"],
-  ["lA0","b14",SIG,1,"j",[], "液晶","A0（DC）","GPIO 14"],
+  ["lSCL","b47",SIG,1,"j",[], "液晶","SCL（SCK）","GPIO 47"],
   ["lSDA","b45",SIG,1,"j",[], "液晶","SDA","GPIO 45"],
-  ["lSCK","b47",SIG,1,"j",[], "液晶","SCK","GPIO 47"],
-  ["lLED","lVCC",RED,1,"s",["lLED","lVCC"], "液晶","LED（バックライト）","液晶の VCC へ短い線で"],
+  ["lRES","b21",SIG,1,"j",[], "液晶","RES（RESET）","GPIO 21"],
+  ["lDC","b14",SIG,1,"j",[], "液晶","DC（A0）","GPIO 14"],
+  ["lCS","b43",SIG,1,"j",[], "液晶","CS","GPIO 43"],
+  ["lBL","bus3",RED,1,"j",[], "液晶","BL（バックライト）","3V3 まとめ点"],
   ["j+5V","bus3",RED,2,"j",[], "ジョイスティック","+5V","3V3 まとめ点（5V ではない）"],
   ["jGND","busG",GND,2,"j",[], "ジョイスティック","GND","GND まとめ点"],
   ["jVRx","b1",SIG,2,"j",[], "ジョイスティック","VRx","GPIO 1"],
@@ -364,18 +364,17 @@ const STEPS = [
   {n:0, t:"ボードだけで書き込む", kind:"prep", focus:["board"], body:`
    <h2>0. ボードだけで書き込む</h2>
    <ol><li>まだ何もつながず、ボードだけを USB-C ケーブルでパソコンにつなぎます。</li>
-   <li>PlatformIO でビルドして書き込みます（<code>pio run -t upload</code>）。</li>
+   <li>テスト用のビルドを書き込みます（<code>pio run -e bench -t upload</code>）。Wi-Fi 設定がないと <code>CYBERSHOT</code> というアクセスポイントが立つので、スマホでつないで <code>http://192.168.4.1/log</code> を開きます。</li>
    <li>microSD を挿し、カメラのケーブルがしっかり刺さっているか確かめます。</li></ol>
-   <p class="note">画面がまだないので、ここでは書き込みが成功すれば十分です。</p>`},
+   <p class="note">ログに SD とカメラの OK が出れば十分です。GPIO 41 と GND をジャンパー線で一瞬つなぐと写真が撮れ、<code>/galeria</code> で見られます。</p>`},
   {n:1, t:"液晶", kind:"plug", focus:["lcd","board"], body:`
    <h2>1. 液晶（8本）</h2>
    <ol><li><b>このボードは 3V3 と GND のピンが1本ずつしかありません。</b>先にジャンパー線を半分に切って「3V3 まとめ点」と「GND まとめ点」を作り、ボードの 3V3 と GND から1本ずつつなぎます。</li>
-   <li>液晶の VCC と GND を、それぞれのまとめ点へ。</li>
-   <li>信号の5本はメス-メスのジャンパー線で直接つなぎます。CS→43、RESET→21、A0→14、SDA→45、SCK→47。</li>
-   <li><b>LED（バックライト）</b>は、液晶の VCC と短い線ではんだでつなぎます。</li>
-   <li>液晶にピンヘッダが付いていなければ、先に8本のピンをはんだ付けします。</li>
+   <li>液晶の VCC と BL（バックライト）を 3V3 まとめ点へ、GND を GND まとめ点へ。</li>
+   <li>信号の5本はメス-メスのジャンパー線で直接つなぎます。SCL→47、SDA→45、RES→21、DC→14、CS→43。</li>
+   <li>液晶（WINGONEER）は最初からピンヘッダが付いているので、液晶側のはんだ付けはいりません。</li>
    <li>USB をつないで起動画面が出れば成功です。</li></ol>
-   <p class="joints">LED と VCC、3V3 まとめ点、GND まとめ点</p>`},
+   <p class="joints">3V3 まとめ点、GND まとめ点</p>`},
   {n:2, t:"ジョイスティック", kind:"plug", focus:["joy","board"], body:`
    <h2>2. ジョイスティック（5本）</h2>
    <ol><li><b>+5V と書かれた端子は 3V3 まとめ点へ。</b>5V につなぐと読み取れる範囲を超えます。</li>

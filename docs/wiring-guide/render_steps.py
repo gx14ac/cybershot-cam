@@ -41,7 +41,7 @@ for i, n in enumerate(HDR_R):
     add_pin("b" + n, "board", 2.95 - i * 0.31, -1.15, n)
 for i, n in enumerate(HDR_L):
     add_pin("b" + n, "board", 2.95 - i * 0.31, 1.15, n)
-for i, n in enumerate(["VCC", "GND", "CS", "RESET", "A0", "SDA", "SCK", "LED"]):
+for i, n in enumerate(["GND", "VCC", "SCL", "SDA", "RES", "DC", "CS", "BL"]):
     add_pin("l" + n, "lcd", -1.575 + i * 0.45, 2.3, n)
 for i, n in enumerate(["GND", "+5V", "VRx", "VRy", "SW"]):
     add_pin("j" + n, "joy", -0.9 + i * 0.45, -1.5, n)
@@ -59,9 +59,9 @@ add_pin("busG", "board", -4.7, -0.5, "GND BUS", 0.15); P["busG"]["comp"] = "bus"
 
 W = [
     ("b3V3", "bus3", RED, 1, ["bus3"]), ("bGND", "busG", BLK, 1, ["busG"]),
-    ("lVCC", "bus3", RED, 1, []), ("lGND", "busG", BLK, 1, []), ("lCS", "b43", SIG, 1, []),
-    ("lRESET", "b21", SIG, 1, []), ("lA0", "b14", SIG, 1, []), ("lSDA", "b45", SIG, 1, []),
-    ("lSCK", "b47", SIG, 1, []), ("lLED", "lVCC", RED, 1, ["lLED", "lVCC"]),
+    ("lVCC", "bus3", RED, 1, []), ("lGND", "busG", BLK, 1, []), ("lSCL", "b47", SIG, 1, []),
+    ("lSDA", "b45", SIG, 1, []), ("lRES", "b21", SIG, 1, []), ("lDC", "b14", SIG, 1, []),
+    ("lCS", "b43", SIG, 1, []), ("lBL", "bus3", RED, 1, []),
     ("j+5V", "bus3", RED, 2, ["bus3"]), ("jGND", "busG", BLK, 2, ["busG"]), ("jVRx", "b1", SIG, 2, []),
     ("jVRy", "b2", SIG, 2, []), ("jSW", "b42", SIG, 2, []),
     ("btn1", "b41", SIG, 3, ["btn1"]), ("btn2", "busG", BLK, 3, ["btn2", "busG"]),

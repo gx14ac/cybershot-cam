@@ -17,7 +17,7 @@ The firmware is by [cebola4444](https://github.com/cebola4444/cybershot-cam) (@c
 | Part | Notes |
 | --- | --- |
 | Freenove ESP32-S3 WROOM CAM, N16R8 | 16 MB flash, 8 MB PSRAM, OV2640 camera, onboard microSD slot |
-| 1.8" SPI TFT, ST7735, 128×160 | viewfinder |
+| 1.8" SPI TFT, ST7735, 128×160 | viewfinder (this build: WINGONEER ST7735S, see [docs/lcd.md](docs/lcd.md)) |
 | KY-023 joystick | menu |
 | Momentary push button | shutter |
 | 5 mm red LED + 100 Ω resistor | flash (optional) |
@@ -38,15 +38,15 @@ You also need female-female jumper wires, a soldering iron, solder, heat-shrink 
 
 | From | To |
 | --- | --- |
-| LCD CS / RESET / A0 / SDA / SCK | GPIO 43 / 21 / 14 / 45 / 47 |
-| LCD VCC, LED | 3V3 |
+| LCD CS / RES / DC / SDA / SCL | GPIO 43 / 21 / 14 / 45 / 47 |
+| LCD VCC, BL | 3V3 |
 | Joystick VRx / VRy / SW | GPIO 1 / 2 / 42 |
 | Joystick +5V | **3V3**, not 5V (the ADC is 3.3 V) |
 | Shutter button | GPIO 41 and GND |
 | Flash LED | GPIO 48 → 100 Ω → LED → GND |
 | MT3608 VOUT+ / VOUT- | board 5V / GND |
 
-The board has only one 3V3 pin and one GND pin, so splice the wires that need them at a junction. The guide shows each step in 3D.
+Pin names differ between modules: DC is also labeled A0, RES is RESET, SCL is SCK, BL is LED. The board has only one 3V3 pin and one GND pin, so splice the wires that need them at a junction. The guide shows each step in 3D.
 
 ## Build and flash
 
